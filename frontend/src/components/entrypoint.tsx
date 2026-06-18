@@ -168,7 +168,7 @@ export default function Entrypoint({ onStartEmulating, onOpenSettings }: Entrypo
         </span>
         <br />
         <span class="disclaimer-text">
-          This emulator should <i>only</i> be used to emulate importeds acquired ROM and BIOS files. This emulator
+          This emulator should <i>only</i> be used to emulate importedss acquired ROM and BIOS files. This emulator
           is not affiliated with or endorsed by Nintendo. The Nintendo DS is a trademark of Nintendo Corporation,
           Limited.
         </span>
