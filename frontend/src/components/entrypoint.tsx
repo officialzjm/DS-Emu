@@ -15,6 +15,28 @@ export default function Entrypoint({ onStartEmulating, onOpenSettings }: Entrypo
   const [isFirmwareBooting, setFirmwareBooting] = useState(false);
   const [firmwareBootEnabled, setFirmwareBootEnabled] = useState(false);
 
+  const loadRomFromUrl = async (url: string) => {
+    setLoading(true);
+  
+    const response = await fetch(url);
+    const romData = new Uint8Array(await response.arrayBuffer());
+  
+    window.WebMelon.cart.createCart();
+    window.WebMelon.storage.createDirectory('/roms');
+  
+    window.WebMelon.storage.write('/roms/game.nds', romData);
+  
+    window.WebMelon.emulator.createEmulator();
+  
+    if (!window.WebMelon.cart.loadFileIntoCart('/roms/game.nds')) {
+      setLoading(false);
+      return;
+    }
+  
+    window.WebMelon.storage.onPrepare(prepareHandler);
+    window.WebMelon.storage.prepareVirtualFilesystem();
+  };
+  
   const fileSelectHandler = (event: ChangeEvent<HTMLInputElement>) => {
     let input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
@@ -91,6 +113,15 @@ export default function Entrypoint({ onStartEmulating, onOpenSettings }: Entrypo
     }, 500);
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const rom = params.get('rom');
+  
+    if (rom) {
+      loadRomFromUrl(rom);
+    }
+  }, []);
+
   return (
     <>
       <h1>{'🎮 DS Anywhere'}</h1>
@@ -137,7 +168,7 @@ export default function Entrypoint({ onStartEmulating, onOpenSettings }: Entrypo
         </span>
         <br />
         <span class="disclaimer-text">
-          This emulator should <i>only</i> be used to emulate legally acquired ROM and BIOS files. This emulator
+          This emulator should <i>only</i> be used to emulate imported acquired ROM and BIOS files. This emulator
           is not affiliated with or endorsed by Nintendo. The Nintendo DS is a trademark of Nintendo Corporation,
           Limited.
         </span>
